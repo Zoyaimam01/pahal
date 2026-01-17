@@ -1,5 +1,7 @@
 import React from 'react'
 import { StatCard } from '../components/ui/StatCard'
+import { IncidentCard } from '../components/incident/IncidentCard'
+import { mockIncidents } from '../lib/mockData'
 
 export default function AdminDashboard() {
   return (
@@ -15,8 +17,12 @@ export default function AdminDashboard() {
         </div>
 
         <div className='bg-white rounded-lg shadow p-6'>
-          <h2 className='text-2xl font-bold mb-4'>Recent Incidents</h2>
-          <p className='text-gray-600'>Incident feed will be displayed here</p>
+          <h2 className='text-2xl font-bold mb-6'>Recent Incidents</h2>
+          <div className='space-y-4'>
+            {mockIncidents.map((incident) => (
+              <IncidentCard key={incident.id} {...incident} />
+            ))}
+          </div>
         </div>
       </div>
     </div>
