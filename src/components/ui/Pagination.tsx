@@ -1,30 +1,48 @@
 import React from 'react'
-import { cn } from '../../lib/utils'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { Button } from './Button'
 
-interface PaginationProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('flex items-center justify-center gap-2', className)} {...props} />
-  )
-)
-Pagination.displayName = 'Pagination'
-
-interface PaginationItemProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  isActive?: boolean
+interface PaginationProps {
+  currentPage: number
+  totalPages: number
+  onPageChange: (page: number) => void
 }
 
-export const PaginationItem = React.forwardRef<HTMLButtonElement, PaginationItemProps>(
-  ({ className, isActive, ...props }, ref) => (
-    <button
-      ref={ref}
-      className={cn(
-        'px-3 py-1 rounded-lg text-sm font-medium transition-colors',
-        isActive ? 'bg-blue-600 text-white' : 'bg-white border border-gray-300 hover:bg-gray-50',
-        className
-      )}
-      {...props}
-    />
+export const Pagination: React.FC<PaginationProps> = ({
+  currentPage,
+  totalPages,
+  onPageChange
+}) => {
+  return (
+    <div className='flex items-center justify-center gap-2'>
+      <Button
+        variant='outline'
+        size='sm'
+        onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+        disabled={currentPage === 1}
+      >
+        <ChevronLeft className='w-4 h-4' />
+      </Button>
+      
+      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+        <Button
+          key={page}
+          variant={page === currentPage ? 'primary' : 'outline'}
+          size='sm'
+          onClick={() => onPageChange(page)}
+        >
+          {page}
+        </Button>
+      ))}
+      
+      <Button
+        variant='outline'
+        size='sm'
+        onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+        disabled={currentPage === totalPages}
+      >
+        <ChevronRight className='w-4 h-4' />
+      </Button>
+    </div>
   )
-)
-PaginationItem.displayName = 'PaginationItem'
+}
