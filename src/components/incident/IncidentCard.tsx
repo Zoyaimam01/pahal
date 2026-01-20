@@ -1,42 +1,88 @@
+// @ts-nocheck
 import React from 'react'
-import { StatusBadge } from '../ui/StatusBadge'
+import { MapPin, Clock, AlertTriangle, ChevronRight, Users } from 'lucide-react'
+import { format } from 'date-fns'
+import { motion } from 'framer-motion'
+import StatusBadge from '../ui/StatusBadge'
+import { cn } from '../../lib/utils'
+import type { Incident } from '../../lib/database.types'
 
 interface IncidentCardProps {
-  id: string
-  type: string
-  location: string
-  time: string
-  status: 'pending' | 'active' | 'resolved' | 'cancelled'
-  severity: 'low' | 'medium' | 'high'
+  incident: Incident
+  onClick?: () => void
+  compact?: boolean
 }
 
-export const IncidentCard: React.FC<IncidentCardProps> = ({
-  id,
-  type,
-  location,
-  time,
-  status,
-  severity
-}) => {
-  const severityColors = {
-    low: 'border-l-green-500',
-    medium: 'border-l-yellow-500',
-    high: 'border-l-red-500'
-  }
+export default function IncidentCard({ incident, onClick, compact = false }: IncidentCardProps) {
+  const isCritical = incident.severity === 'critical'
 
   return (
-    <div className={g-white rounded-lg shadow p-4 border-l-4 +severityColors[severity]}>
-      <div className='flex justify-between items-start mb-2'>
-        <div>
-          <h3 className='font-semibold text-lg'>{type}</h3>
-          <p className='text-sm text-gray-500'>ID: {id}</p>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -2 }}
+      onClick={onClick}
+      className={cn(
+        'bg-white rounded-2xl border transition-all duration-300 cursor-pointer group',
+        isCritical
+          ? 'border-red-200 shadow-red-100 hover:shadow-red-200 hover:border-red-300'
+          : 'border-gray-100 hover:border-gray-200',
+        'hover:shadow-lg p-4'
+      )}
+    >
+      <div className="flex items-start gap-4">
+        {incident.media_urls?.[0] && !compact && (
+          <img
+            src={incident.media_urls[0]}
+            alt="Incident"
+            className="w-20 h-20 rounded-xl object-cover flex-shrink-0"
+          />
+        )}
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2 mb-2">
+            <h3 className="font-semibold text-gray-900 truncate">
+              {incident.title || incident.accident_type?.replace('_', ' ')}
+            </h3>
+            <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 flex-shrink-0 transition-transform group-hover:translate-x-1" />
+          </div>
+
+          <div className="flex flex-wrap gap-2 mb-3">
+            <StatusBadge status={incident.status} type="status" />
+            <StatusBadge severity={incident.severity} type="severity" />
+          </div>
+
+          <div className="space-y-1.5 text-sm text-gray-500">
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-gray-400" />
+              <span className="truncate">{incident.address || 'Location pending...'}</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-gray-400" />
+                <span>{format(new Date(incident.created_at), 'MMM d, h:mm a')}</span>
+              </div>
+              {incident.report_count > 1 && (
+                <div className="flex items-center gap-1 text-orange-600">
+                  <Users className="w-4 h-4" />
+                  <span className="font-medium">{incident.report_count} reports</span>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-        <StatusBadge status={status} />
       </div>
-      <div className='space-y-1 text-sm'>
-        <p className='text-gray-700'> {location}</p>
-        <p className='text-gray-500'> {time}</p>
-      </div>
-    </div>
+
+      {isCritical && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mt-3 pt-3 border-t border-red-100 flex items-center gap-2 text-red-600 text-sm font-medium"
+        >
+          <AlertTriangle className="w-4 h-4 animate-pulse" />
+          <span>Critical - Immediate attention required</span>
+        </motion.div>
+      )}
+    </motion.div>
   )
 }

@@ -1,26 +1,27 @@
-/**
- * Public Layout
- * For unauthenticated users - Home, Report, Hotspots only
- */
-
 import React, { useState } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Shield } from 'lucide-react'
+import {
+  Menu,
+  X,
+  LogOut,
+} from 'lucide-react'
 import { cn } from '../lib/utils'
 
-const publicNavItems = [
+const navItems = [
   { name: 'Home', path: '/' },
-  { name: 'Report Accident', path: '/report' },
   { name: 'Hotspots', path: '/hotspots' },
+  { name: 'Dashboard', path: '/admin' },
+  { name: 'Smart Camera', path: '/smart-camera' },
+  { name: 'Analytics', path: '/analytics' },
 ]
 
-export default function PublicLayout() {
+export default function Layout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const location = useLocation()
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-slate-50">
       {/* Navigation */}
       <nav className="bg-white border-b border-gray-100 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -36,7 +37,7 @@ export default function PublicLayout() {
 
             {/* Center Navigation */}
             <div className="hidden md:flex items-center gap-1 bg-gray-50 rounded-full px-2 py-1">
-              {publicNavItems.map((item) => {
+              {navItems.map((item) => {
                 const isActive = location.pathname === item.path
                 return (
                   <Link
@@ -55,14 +56,8 @@ export default function PublicLayout() {
               })}
             </div>
 
-            {/* Admin Login Link */}
-            <Link
-              to="/admin"
-              className="hidden md:flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
-            >
-              <Shield className="w-4 h-4" />
-              Admin
-            </Link>
+            {/* Empty div to balance the layout */}
+            <div className="hidden md:block w-8" />
 
             {/* Mobile menu button */}
             <motion.button
@@ -90,7 +85,7 @@ export default function PublicLayout() {
               className="md:hidden border-t border-gray-100 bg-white rounded-b-2xl shadow-lg overflow-hidden"
             >
               <div className="px-4 py-3 space-y-1">
-                {publicNavItems.map((item) => {
+                {navItems.map((item) => {
                   const isActive = location.pathname === item.path
                   return (
                     <Link
@@ -108,14 +103,6 @@ export default function PublicLayout() {
                     </Link>
                   )
                 })}
-                <Link
-                  to="/admin"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-50 transition-colors"
-                >
-                  <Shield className="w-5 h-5" />
-                  <span className="font-medium">Admin Login</span>
-                </Link>
               </div>
             </motion.div>
           )}
@@ -123,12 +110,12 @@ export default function PublicLayout() {
       </nav>
 
       {/* Page Content */}
-      <main className="flex-1">
+      <main>
         <Outlet />
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-100">
+      <footer className="bg-white border-t border-gray-100 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">

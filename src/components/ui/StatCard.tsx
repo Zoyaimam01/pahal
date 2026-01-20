@@ -1,50 +1,64 @@
 import React from 'react'
 import { cn } from '../../lib/utils'
+import { motion } from 'framer-motion'
+import { LucideIcon } from 'lucide-react'
 
 interface StatCardProps {
   title: string
   value: string | number
-  icon?: React.ReactNode
-  trend?: {
-    value: number
-    isPositive: boolean
-  }
+  icon?: LucideIcon
+  trend?: string
+  trendUp?: boolean
   className?: string
+  iconBg?: string
+  iconColor?: string
 }
 
-export const StatCard: React.FC<StatCardProps> = ({
+export default function StatCard({
   title,
   value,
-  icon,
+  icon: Icon,
   trend,
-  className
-}) => {
+  trendUp,
+  className,
+  iconBg = 'bg-blue-50',
+  iconColor = 'text-blue-600',
+}: StatCardProps) {
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -2 }}
       className={cn(
-        'rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all hover:shadow-md',
+        'bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300',
         className
       )}
     >
-      <div className='flex items-start justify-between'>
-        <div className='space-y-1'>
-          <p className='text-sm font-medium text-gray-600'>{title}</p>
-          <p className='text-3xl font-bold text-gray-900'>{value}</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-sm font-medium text-gray-500 mb-1">{title}</p>
+          <p className="text-3xl font-bold text-gray-900">{value}</p>
           {trend && (
-            <p className={cn(
-              'text-sm font-medium',
-              trend.isPositive ? 'text-green-600' : 'text-red-600'
-            )}>
-              {trend.isPositive ? '' : ''} {Math.abs(trend.value)}%
-            </p>
+            <div
+              className={cn(
+                'flex items-center gap-1 text-xs font-medium mt-2',
+                trendUp ? 'text-green-600' : 'text-red-600'
+              )}
+            >
+              <span>{trendUp ? '↑' : '↓'}</span>
+              <span>{trend}</span>
+            </div>
           )}
         </div>
-        {icon && (
-          <div className='rounded-lg bg-blue-50 p-3 text-blue-600'>
-            {icon}
-          </div>
+        {Icon && (
+          <motion.div
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            className={cn('p-3 rounded-xl', iconBg)}
+          >
+            <Icon className={cn('w-6 h-6', iconColor)} />
+          </motion.div>
         )}
       </div>
-    </div>
+    </motion.div>
   )
 }
